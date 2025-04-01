@@ -1,33 +1,23 @@
 package com.example.riskFinder.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 @Entity
-@Table(name = "crack_detection")
+@Table(name = "waypoint")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class CrackDetection {
+public class Waypoint {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "crack_id", nullable = false, unique = true)
+    @Column(name = "crack_id", nullable = false)
     private String crackId;
 
     @Column(nullable = false)
@@ -39,11 +29,11 @@ public class CrackDetection {
     @Column(nullable = false)
     private double altitude;
 
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
+    @Column(name = "hover_time")
+    private int hoverTime = 10;
 
-    @Column(name = "detected_at")
-    private LocalDateTime detectedAt;
+    @Column(name = "visit_count")
+    private int visitCount = 0;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

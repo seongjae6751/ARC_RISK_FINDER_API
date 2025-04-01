@@ -1,6 +1,6 @@
 package com.example.riskFinder.dto;
 
-public record CrackDetectionRequest(
+public record CrackRequest(
     String crackId,
     double latitude,
     double longitude,
