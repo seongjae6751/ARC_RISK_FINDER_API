@@ -12,9 +12,9 @@ import com.example.riskFinder.service.CrackDetectionService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/crack")
+@RequestMapping("/crack")
 @RequiredArgsConstructor
-public class CrackCotroller {
+public class CrackCotroller implements CrackApi{
 
     private final CrackDetectionService crackDetectionService;
 

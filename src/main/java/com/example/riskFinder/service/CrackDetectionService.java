@@ -1,6 +1,7 @@
 package com.example.riskFinder.service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class CrackDetectionService {
 
     public void save(CrackDetectionRequest request) {
         CrackDetection entity = CrackDetection.builder()
-            .crackId(request.crackId())
+            .crackId(request.crackId() != null ? request.crackId() : UUID.randomUUID().toString())
             .latitude(request.latitude())
             .longitude(request.longitude())
             .altitude(request.altitude())
