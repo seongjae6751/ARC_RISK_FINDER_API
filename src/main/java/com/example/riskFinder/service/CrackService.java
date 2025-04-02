@@ -1,9 +1,12 @@
 package com.example.riskFinder.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import com.example.riskFinder.dto.WaypointRequest;
+import com.example.riskFinder.dto.WaypointsResponse;
 import com.example.riskFinder.model.Waypoint;
 import com.example.riskFinder.repository.WaypointRepository;
 import org.springframework.stereotype.Service;
@@ -18,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrackService {
 
-    private final CrackRepository repository;
+    private final CrackRepository crackRepository;
     private final WaypointRepository waypointRepository;
 
     public void save(WaypointRequest request) {
@@ -30,5 +33,20 @@ public class CrackService {
                 .build();
 
         waypointRepository.save(waypoint);
+    }
+
+    public List<WaypointsResponse> getWaypoints() {
+        return waypointRepository.findAll().stream()
+                .map(wp -> {
+                    LocalDate latest = crackRepository.findLatestDetectionDate(wp.getCrackId());
+                    return new WaypointsResponse(
+                            wp.getId(),
+                            "WP " + wp.getId(),
+                            wp.getLatitude(),
+                            wp.getLongitude(),
+                            wp.getAltitude(),
+                            latest
+                    );
+                }).toList();
     }
 }
