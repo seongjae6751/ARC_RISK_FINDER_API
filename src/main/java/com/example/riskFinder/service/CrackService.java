@@ -5,14 +5,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import com.example.riskFinder.dto.WaypointImagesResponse;
-import com.example.riskFinder.dto.WaypointRequest;
-import com.example.riskFinder.dto.WaypointsResponse;
+import com.example.riskFinder.dto.*;
+import com.example.riskFinder.model.CrackMeasurement;
 import com.example.riskFinder.model.Waypoint;
+import com.example.riskFinder.repository.CrackMeasurementRepository;
 import com.example.riskFinder.repository.WaypointRepository;
 import org.springframework.stereotype.Service;
 
-import com.example.riskFinder.dto.CrackRequest;
 import com.example.riskFinder.model.Crack;
 import com.example.riskFinder.repository.CrackRepository;
 
@@ -24,6 +23,7 @@ public class CrackService {
 
     private final CrackRepository crackRepository;
     private final WaypointRepository waypointRepository;
+    private final CrackMeasurementRepository measurementRepository;
 
     public void save(WaypointRequest request) {
         Waypoint waypoint = Waypoint.builder()
@@ -60,6 +60,23 @@ public class CrackService {
                             .toList();
 
                     return new WaypointImagesResponse(
+                            wp.getId(),
+                            "WP " + wp.getId(),
+                            entries
+                    );
+                }).toList();
+    }
+
+    public List<WaypointMeasurementsResponse> getWaypointMeasurements() {
+        return waypointRepository.findAll().stream()
+                .map(wp -> {
+                    List<CrackMeasurement> measures = measurementRepository.findByCrackId(wp.getCrackId());
+                    List<WaypointMeasurementsResponse.MeasurementEntry> entries = measures.stream()
+                            .map(m -> new WaypointMeasurementsResponse.MeasurementEntry(
+                                    m.getMeasurementDate().toLocalDate(), m.getWidthMm()))
+                            .toList();
+
+                    return new WaypointMeasurementsResponse(
                             wp.getId(),
                             "WP " + wp.getId(),
                             entries
