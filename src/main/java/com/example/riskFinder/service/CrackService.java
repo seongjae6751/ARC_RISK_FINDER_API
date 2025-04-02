@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.example.riskFinder.dto.WaypointImagesResponse;
 import com.example.riskFinder.dto.WaypointRequest;
 import com.example.riskFinder.dto.WaypointsResponse;
 import com.example.riskFinder.model.Waypoint;
@@ -46,6 +47,22 @@ public class CrackService {
                             wp.getLongitude(),
                             wp.getAltitude(),
                             latest
+                    );
+                }).toList();
+    }
+
+    public List<WaypointImagesResponse> getWaypointImages() {
+        return waypointRepository.findAll().stream()
+                .map(wp -> {
+                    List<Crack> cracks = crackRepository.findByCrackId(wp.getCrackId());
+                    List<WaypointImagesResponse.ImageEntry> entries = cracks.stream()
+                            .map(c -> new WaypointImagesResponse.ImageEntry(c.getImageUrl(), c.getDetectedAt()))
+                            .toList();
+
+                    return new WaypointImagesResponse(
+                            wp.getId(),
+                            "WP " + wp.getId(),
+                            entries
                     );
                 }).toList();
     }

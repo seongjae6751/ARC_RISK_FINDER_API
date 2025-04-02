@@ -1,5 +1,6 @@
 package com.example.riskFinder.controller;
 
+import com.example.riskFinder.dto.WaypointImagesResponse;
 import com.example.riskFinder.dto.WaypointRequest;
 import com.example.riskFinder.dto.WaypointsResponse;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,12 @@ public class CrackCotroller implements CrackApi{
     @GetMapping("/waypoints")
     public ResponseEntity<List<WaypointsResponse>> getWaypoints() {
         List<WaypointsResponse> responses = crackService.getWaypoints();
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/waypoints/images")
+    public ResponseEntity<List<WaypointImagesResponse>> getWaypointImages() {
+        List<WaypointImagesResponse> responses = crackService.getWaypointImages();
         return ResponseEntity.ok(responses);
     }
 }

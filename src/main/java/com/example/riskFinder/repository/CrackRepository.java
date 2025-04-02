@@ -5,8 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.riskFinder.model.Crack;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface CrackRepository extends JpaRepository<Crack, Long> {
 
     LocalDate findLatestDetectionDate(String crackId);
+
+    List<Crack> findByCrackId(String crackId);
 }
