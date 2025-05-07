@@ -6,17 +6,25 @@ import java.util.List;
 import java.util.UUID;
 
 import com.example.riskFinder.dto.*;
+import com.example.riskFinder.model.Building;
 import com.example.riskFinder.model.CrackMeasurement;
 import com.example.riskFinder.model.Waypoint;
+import com.example.riskFinder.repository.BuildingRepository;
 import com.example.riskFinder.repository.CrackMeasurementRepository;
 import com.example.riskFinder.repository.WaypointRepository;
+
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.riskFinder.model.Crack;
 import com.example.riskFinder.repository.CrackRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CrackService {
@@ -24,16 +32,43 @@ public class CrackService {
     private final CrackRepository crackRepository;
     private final WaypointRepository waypointRepository;
     private final CrackMeasurementRepository measurementRepository;
+    private final BuildingRepository buildingRepository;
+    private final KakaoMapService kakaoService;
+    private final GeometryFactory gf = new GeometryFactory(new PrecisionModel(), 4326);
 
-    public void save(WaypointRequest request) {
-        Waypoint waypoint = Waypoint.builder()
-                .crackId(request.crackId())
-                .latitude(request.latitude())
-                .longitude(request.longitude())
-                .altitude(request.altitude())
-                .build();
+    @Transactional
+    public void save(WaypointRequest req) {
 
-        waypointRepository.save(waypoint);
+        log.info("📍 [SAVE] 요청 도착: crackId={}, lat={}, lon={}, alt={}",
+            req.crackId(), req.latitude(), req.longitude(), req.altitude());
+
+        Building building = buildingRepository
+            .findNearest(req.latitude(), req.longitude(), 100)
+            .orElseGet(() -> {
+                log.info("🔍 [BUILDING] DB에 없음 → 카카오 API 호출 시도");
+                return kakaoService.fetchNearestAndConvert(req.latitude(), req.longitude(), 500)
+                    .map(b -> {
+                        log.info("🏢 [BUILDING] 카카오 응답으로 새 건물 저장: {}", b.getName());
+                        return buildingRepository.save(b);
+                    })
+                    .orElseGet(() -> {
+                        log.warn("⚠️ [BUILDING] 카카오에서도 건물 찾지 못함 (null 반환)");
+                        return null;
+                    });
+            });
+
+        log.info("📦 [WAYPOINT] Building 매핑 상태: {}", building != null ? building.getName() : "null");
+
+        Waypoint wp = Waypoint.builder()
+            .crackId(req.crackId())
+            .latitude(req.latitude())
+            .longitude(req.longitude())
+            .altitude(req.altitude())
+            .building(building)
+            .build();
+
+        waypointRepository.save(wp);
+        log.info("✅ [WAYPOINT] 저장 완료: id={}, crackId={}", wp.getId(), wp.getCrackId());
     }
 
     public List<WaypointsResponse> getWaypoints() {
