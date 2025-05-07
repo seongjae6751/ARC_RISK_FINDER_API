@@ -35,6 +35,10 @@ public class Waypoint {
     @Column(name = "visit_count")
     private int visitCount = 0;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "building_id")
+    private Building building;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
