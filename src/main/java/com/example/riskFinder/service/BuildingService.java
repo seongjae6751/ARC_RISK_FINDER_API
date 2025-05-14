@@ -46,7 +46,7 @@ public class BuildingService {
                 List<BuildingResponse.WaypointResponse.CrackResponse> crackResponses = cracks.stream()
                     .map(c -> new BuildingResponse.WaypointResponse.CrackResponse(
                         c.getDetectedAt().toString(),
-                        c.getWidthMm(),
+                        c.get,
                         c.getImageUrl()
                     ))
                     .toList();
