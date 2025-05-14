@@ -1,5 +1,6 @@
 package com.example.riskFinder.service;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -7,8 +8,10 @@ import org.springframework.stereotype.Service;
 import com.example.riskFinder.dto.BuildingResponse;
 import com.example.riskFinder.model.Building;
 import com.example.riskFinder.model.Crack;
+import com.example.riskFinder.model.CrackMeasurement;
 import com.example.riskFinder.model.Waypoint;
 import com.example.riskFinder.repository.BuildingRepository;
+import com.example.riskFinder.repository.CrackMeasurementRepository;
 import com.example.riskFinder.repository.CrackRepository;
 import com.example.riskFinder.repository.WaypointRepository;
 
@@ -21,6 +24,7 @@ public class BuildingService {
     private final BuildingRepository buildingRepository;
     private final WaypointRepository waypointRepository;
     private final CrackRepository crackRepository;
+    private final CrackMeasurementRepository measurementRepository;
 
     public List<BuildingResponse> getAllBuildings() {
         return buildingRepository.findAll().stream()
@@ -44,12 +48,20 @@ public class BuildingService {
             .map(wp -> {
                 List<Crack> cracks = crackRepository.findByCrackId(wp.getCrackId());
                 List<BuildingResponse.WaypointResponse.CrackResponse> crackResponses = cracks.stream()
-                    .map(c -> new BuildingResponse.WaypointResponse.CrackResponse(
-                        c.getDetectedAt().toString(),
-                        c.get,
-                        c.getImageUrl()
-                    ))
-                    .toList();
+                    .map(c -> {
+                        // CrackMeasurement에서 crackId별 최신 width_mm 조회 (측정일 기준 최신값)
+                        CrackMeasurement latestMeasurement = measurementRepository.findByCrackId(c.getCrackId()).stream()
+                            .max(Comparator.comparing(CrackMeasurement::getMeasurementDate))
+                            .orElse(null);
+
+                        double widthMm = latestMeasurement != null ? latestMeasurement.getWidthMm() : 0.0;
+
+                        return new BuildingResponse.WaypointResponse.CrackResponse(
+                            c.getDetectedAt() != null ? c.getDetectedAt().toString() : null,
+                            widthMm,
+                            c.getImageUrl()
+                        );
+                    }).toList();
 
                 return new BuildingResponse.WaypointResponse(
                     wp.getId(),
