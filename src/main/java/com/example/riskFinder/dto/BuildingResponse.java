@@ -15,6 +15,6 @@ public record BuildingResponse(
         Location location,
         List<CrackResponse> cracks
     ) {
-        public record CrackResponse(String timestamp, double width_mm, String imageUrl) {}
+        public record CrackResponse(String timestamp, double widthMm, String imageUrl) {}
     }
 }
