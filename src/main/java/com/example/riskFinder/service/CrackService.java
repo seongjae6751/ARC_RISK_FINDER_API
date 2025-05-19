@@ -38,9 +38,8 @@ public class CrackService {
 
     @Transactional
     public void save(WaypointRequest req) {
-
-        log.info("📍 [SAVE] 요청 도착: crackId={}, lat={}, lon={}, alt={}",
-            req.crackId(), req.latitude(), req.longitude(), req.altitude());
+        log.info("📍 [SAVE] 요청 도착: lat={}, lon={}, alt={}",
+            req.latitude(), req.longitude(), req.altitude());
 
         Building building = buildingRepository
             .findNearest(req.latitude(), req.longitude(), 100)
@@ -51,16 +50,12 @@ public class CrackService {
                         log.info("🏢 [BUILDING] 카카오 응답으로 새 건물 저장: {}", b.getName());
                         return buildingRepository.save(b);
                     })
-                    .orElseGet(() -> {
-                        log.warn("⚠️ [BUILDING] 카카오에서도 건물 찾지 못함 (null 반환)");
-                        return null;
-                    });
+                    .orElse(null);
             });
 
         log.info("📦 [WAYPOINT] Building 매핑 상태: {}", building != null ? building.getName() : "null");
 
         Waypoint wp = Waypoint.builder()
-            .crackId(req.crackId())
             .latitude(req.latitude())
             .longitude(req.longitude())
             .altitude(req.altitude())
@@ -68,38 +63,54 @@ public class CrackService {
             .build();
 
         waypointRepository.save(wp);
-        log.info("✅ [WAYPOINT] 저장 완료: id={}, crackId={}", wp.getId(), wp.getCrackId());
+        log.info("✅ [WAYPOINT] 저장 완료: id={}", wp.getId());
     }
 
     public List<WaypointsResponse> getWaypoints() {
         return waypointRepository.findAll().stream()
-                .map(wp -> {
-                    LocalDate latest = crackRepository.findLatestDetectionDate(wp.getCrackId());
-                    return new WaypointsResponse(
-                            wp.getId(),
-                            "WP " + wp.getId(),
-                            wp.getLatitude(),
-                            wp.getLongitude(),
-                            wp.getAltitude(),
-                            latest
-                    );
-                }).toList();
+            .map(wp -> {
+                // 가장 최근 Crack 탐지일 조회 (좌표 기준)
+                List<Crack> cracks = crackRepository.findByExactLocation(
+                    wp.getLatitude(), wp.getLongitude(), wp.getAltitude()
+                );
+
+                LocalDate latest = cracks.stream()
+                    .map(Crack::getDetectedAt)
+                    .filter(d -> d != null)
+                    .map(LocalDateTime::toLocalDate)
+                    .max(LocalDate::compareTo)
+                    .orElse(null);
+
+                return new WaypointsResponse(
+                    wp.getId(),
+                    "WP " + wp.getId(),
+                    wp.getLatitude(),
+                    wp.getLongitude(),
+                    wp.getAltitude(),
+                    latest
+                );
+            }).toList();
     }
 
     public List<WaypointImagesResponse> getWaypointImages() {
         return waypointRepository.findAll().stream()
-                .map(wp -> {
-                    List<Crack> cracks = crackRepository.findByCrackId(wp.getCrackId());
-                    List<WaypointImagesResponse.ImageEntry> entries = cracks.stream()
-                            .map(c -> new WaypointImagesResponse.ImageEntry(c.getImageUrl(), c.getDetectedAt()))
-                            .toList();
+            .map(wp -> {
+                List<Crack> cracks = crackRepository.findByExactLocation(
+                    wp.getLatitude(), wp.getLongitude(), wp.getAltitude()
+                );
+                List<WaypointImagesResponse.ImageEntry> entries = cracks.stream()
+                    .map(c -> new WaypointImagesResponse.ImageEntry(
+                        c.getImageUrl(),
+                        c.getDetectedAt()
+                    ))
+                    .toList();
 
-                    return new WaypointImagesResponse(
-                            wp.getId(),
-                            "WP " + wp.getId(),
-                            entries
-                    );
-                }).toList();
+                return new WaypointImagesResponse(
+                    wp.getId(),
+                    "WP " + wp.getId(),
+                    entries
+                );
+            }).toList();
     }
 
     public List<WaypointMeasurementsResponse> getWaypointMeasurementsByBuilding(Long buildingId) {
@@ -108,17 +119,23 @@ public class CrackService {
 
         return waypointRepository.findByBuildingId(buildingId).stream()
             .map(wp -> {
-                List<CrackMeasurement> measurements = measurementRepository.findByCrackId(wp.getCrackId());
-                List<WaypointMeasurementsResponse.Measurement> measurementList = measurements.stream()
+                List<Crack> cracks = crackRepository.findByExactLocation(
+                    wp.getLatitude(), wp.getLongitude(), wp.getAltitude()
+                );
+
+                List<CrackMeasurement> allMeasurements = cracks.stream()
+                    .flatMap(c -> measurementRepository.findByCrackId(c.getCrackId()).stream())
+                    .toList();
+
+                List<WaypointMeasurementsResponse.Measurement> measurementList = allMeasurements.stream()
                     .map(m -> new WaypointMeasurementsResponse.Measurement(
                         m.getMeasurementDate(),
                         m.getWidthMm()
-                    ))
-                    .toList();
+                    )).toList();
 
                 return new WaypointMeasurementsResponse(
                     wp.getId(),
-                    wp.getCrackId(),
+                    "WP " + wp.getId(),
                     new WaypointMeasurementsResponse.Location(wp.getLatitude(), wp.getLongitude()),
                     measurementList
                 );

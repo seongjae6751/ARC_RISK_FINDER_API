@@ -18,21 +18,36 @@ public interface CrackRepository extends JpaRepository<Crack, Long> {
 
     List<Crack> findByCrackId(String crackId);
 
-    @Query("""
-    SELECT w.building.id AS buildingId, COUNT(c.id) AS crackCount
-    FROM Crack c
-    JOIN Waypoint w ON c.crackId = w.crackId
-    GROUP BY w.building.id
+    @Query(value = """
+    SELECT w.building_id AS buildingId, COUNT(c.id) AS crackCount
+    FROM waypoint w
+    JOIN crack c ON 
+      ABS(c.latitude - w.latitude) < 0.00001 AND
+      ABS(c.longitude - w.longitude) < 0.00001 AND
+      ABS(c.altitude - w.altitude) < 0.1
+    GROUP BY w.building_id
     ORDER BY crackCount DESC
-""")
+    """, nativeQuery = true)
     List<BuildingCrackCountDto> getCrackCountPerBuilding();
 
-    @Query("""
-    SELECT w.building.id AS buildingId, MAX(cm.widthMm) AS maxWidth
-    FROM CrackMeasurement cm
-    JOIN Waypoint w ON cm.crackId = w.crackId
-    GROUP BY w.building.id
+    @Query(value = """
+    SELECT w.building_id AS buildingId, MAX(cm.width_mm) AS maxWidth
+    FROM crack_measurement cm
+    JOIN crack c ON cm.crack_id = c.crack_id
+    JOIN waypoint w ON 
+      ABS(c.latitude - w.latitude) < 0.00001 AND
+      ABS(c.longitude - w.longitude) < 0.00001 AND
+      ABS(c.altitude - w.altitude) < 0.1
+    GROUP BY w.building_id
     ORDER BY maxWidth DESC
-""")
+    """, nativeQuery = true)
     List<BuildingCrackWidthDto> getMaxCrackWidthPerBuilding();
+
+    @Query("""
+    SELECT c FROM Crack c
+    WHERE c.latitude = :lat
+      AND c.longitude = :lon
+      AND c.altitude = :alt
+""")
+    List<Crack> findByExactLocation(double lat, double lon, double alt);
 }

@@ -46,26 +46,27 @@ public class BuildingService {
 
         List<BuildingResponse.WaypointResponse> waypointResponses = waypoints.stream()
             .map(wp -> {
-                List<Crack> cracks = crackRepository.findByCrackId(wp.getCrackId());
+                List<Crack> cracks = crackRepository.findByExactLocation(
+                    wp.getLatitude(), wp.getLongitude(), wp.getAltitude()
+                );
+
                 List<BuildingResponse.WaypointResponse.CrackResponse> crackResponses = cracks.stream()
                     .map(c -> {
-                        // CrackMeasurement에서 crackId별 최신 width_mm 조회 (측정일 기준 최신값)
-                        CrackMeasurement latestMeasurement = measurementRepository.findByCrackId(c.getCrackId()).stream()
+                        CrackMeasurement latest = measurementRepository.findByCrackId(c.getCrackId())
+                            .stream()
                             .max(Comparator.comparing(CrackMeasurement::getMeasurementDate))
                             .orElse(null);
 
-                        double widthMm = latestMeasurement != null ? latestMeasurement.getWidthMm() : 0.0;
-
                         return new BuildingResponse.WaypointResponse.CrackResponse(
                             c.getDetectedAt() != null ? c.getDetectedAt().toString() : null,
-                            widthMm,
+                            latest != null ? latest.getWidthMm() : 0.0,
                             c.getImageUrl()
                         );
                     }).toList();
 
                 return new BuildingResponse.WaypointResponse(
                     wp.getId(),
-                    wp.getCrackId(),
+                    "WP " + wp.getId(),
                     new BuildingResponse.Location(wp.getLatitude(), wp.getLongitude()),
                     crackResponses
                 );

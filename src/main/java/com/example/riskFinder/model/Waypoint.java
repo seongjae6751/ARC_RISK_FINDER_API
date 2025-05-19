@@ -17,9 +17,6 @@ public class Waypoint {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "crack_id", nullable = false)
-    private String crackId;
-
     @Column(nullable = false)
     private double latitude;
 
