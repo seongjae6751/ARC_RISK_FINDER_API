@@ -3,6 +3,7 @@ package com.example.riskFinder.controller;
 import com.example.riskFinder.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,12 +45,14 @@ public interface CrackApi {
     @GetMapping("/waypoints/images")
     ResponseEntity<List<WaypointImagesResponse>> getWaypointImages();
 
-    @Operation(summary = "날짜별 waypoint에 대한 균열 너비 시계열 데이터 조회")
+    @Operation(summary = "빌딩별 waypoint에 대한 균열 너비 시계열 데이터 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = ""),
             @ApiResponse(responseCode = "400", description = ""),
             @ApiResponse(responseCode = "404", description = "")
     })
-    @GetMapping("/waypoints/measurements")
-    ResponseEntity<List<WaypointMeasurementsResponse>> getWaypointMeasurements();
+    @GetMapping("/buildings/{id}/waypoints/measurements")
+    ResponseEntity<List<WaypointMeasurementsResponse>> getWaypointMeasurementsByBuilding(
+        @PathVariable Long id
+    );
 }

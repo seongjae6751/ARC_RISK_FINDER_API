@@ -102,20 +102,26 @@ public class CrackService {
                 }).toList();
     }
 
-    public List<WaypointMeasurementsResponse> getWaypointMeasurements() {
-        return waypointRepository.findAll().stream()
-                .map(wp -> {
-                    List<CrackMeasurement> measures = measurementRepository.findByCrackId(wp.getCrackId());
-                    List<WaypointMeasurementsResponse.MeasurementEntry> entries = measures.stream()
-                            .map(m -> new WaypointMeasurementsResponse.MeasurementEntry(
-                                    m.getMeasurementDate().toLocalDate(), m.getWidthMm()))
-                            .toList();
+    public List<WaypointMeasurementsResponse> getWaypointMeasurementsByBuilding(Long buildingId) {
+        Building building = buildingRepository.findById(buildingId)
+            .orElseThrow(() -> new IllegalArgumentException("Building not found: " + buildingId));
 
-                    return new WaypointMeasurementsResponse(
-                            wp.getId(),
-                            "WP " + wp.getId(),
-                            entries
-                    );
-                }).toList();
+        return waypointRepository.findByBuildingId(buildingId).stream()
+            .map(wp -> {
+                List<CrackMeasurement> measurements = measurementRepository.findByCrackId(wp.getCrackId());
+                List<WaypointMeasurementsResponse.Measurement> measurementList = measurements.stream()
+                    .map(m -> new WaypointMeasurementsResponse.Measurement(
+                        m.getMeasurementDate(),
+                        m.getWidthMm()
+                    ))
+                    .toList();
+
+                return new WaypointMeasurementsResponse(
+                    wp.getId(),
+                    wp.getCrackId(),
+                    new WaypointMeasurementsResponse.Location(wp.getLatitude(), wp.getLongitude()),
+                    measurementList
+                );
+            }).toList();
     }
 }
