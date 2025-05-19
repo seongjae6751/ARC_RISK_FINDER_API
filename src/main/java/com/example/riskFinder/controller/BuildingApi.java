@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RequestMapping("/buildings")
 public interface BuildingApi {
-    @Operation(summary = "크랙 감지 하면 저장")
+    @Operation(summary = "빌딩 정보 가져오기")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201"),
         @ApiResponse(responseCode = "400"),
@@ -23,7 +23,7 @@ public interface BuildingApi {
     @GetMapping
     List<BuildingResponse> getBuildings();
 
-    @Operation(summary = "크랙 감지 하면 저장")
+    @Operation(summary = "특정 빌딩 가져오기")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = ""),
         @ApiResponse(responseCode = "400", description = ""),
