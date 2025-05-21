@@ -42,7 +42,7 @@ public class CrackService {
             req.latitude(), req.longitude(), req.altitude());
 
         Building building = buildingRepository
-            .findNearest(req.latitude(), req.longitude(), 100)
+            .findNearestByLonLat(req.latitude(), req.longitude(), 100)
             .orElseGet(() -> {
                 log.info("🔍 [BUILDING] DB에 없음 → 카카오 API 호출 시도");
                 return kakaoService.fetchNearestAndConvert(req.latitude(), req.longitude(), 500)
