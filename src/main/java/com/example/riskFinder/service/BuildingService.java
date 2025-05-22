@@ -39,8 +39,7 @@ public class BuildingService {
     }
 
     private BuildingResponse convertToResponse(Building building) {
-        List<Waypoint> waypoints = waypointRepository.findAll()
-            .stream()
+        List<Waypoint> waypoints = waypointRepository.findAll().stream()
             .filter(wp -> wp.getBuilding() != null && wp.getBuilding().getId().equals(building.getId()))
             .toList();
 
@@ -51,23 +50,13 @@ public class BuildingService {
                 );
 
                 List<BuildingResponse.WaypointResponse.CrackResponse> crackResponses = cracks.stream()
-                    .map(c -> {
-                        List<CrackMeasurement> measurements = measurementRepository.findByCrackId(c.getCrackId());
-
-                        List<BuildingResponse.WaypointResponse.CrackResponse.MeasurementEntry> entries = measurements.stream()
-                            .map(m -> new BuildingResponse.WaypointResponse.CrackResponse.MeasurementEntry(
-                                m.getWidthMm(),
-                                m.getImageUrl(),
-                                m.getMeasurementDate()
-                            ))
-                            .toList();
-
-                        return new BuildingResponse.WaypointResponse.CrackResponse(
-                            c.getDetectedAt() != null ? c.getDetectedAt().toString() : null,
-                            entries
-                        );
-                    })
-                    .toList();
+                    .flatMap(c -> measurementRepository.findByCrackId(c.getCrackId()).stream()
+                        .map(m -> new BuildingResponse.WaypointResponse.CrackResponse(
+                            m.getMeasurementDate().toString(),
+                            m.getWidthMm(),
+                            m.getImageUrl()
+                        ))
+                    ).toList();
 
                 return new BuildingResponse.WaypointResponse(
                     wp.getId(),

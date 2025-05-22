@@ -17,14 +17,9 @@ public record BuildingResponse(
         List<CrackResponse> cracks
     ) {
         public record CrackResponse(
-            String timestamp, // 균열 최초 탐지 시각
-            List<MeasurementEntry> measurements
-        ) {
-            public record MeasurementEntry(
-                double widthMm,
-                String imageUrl,
-                LocalDateTime measuredAt
-            ) {}
-        }
+            String timestamp,
+            double width_mm,
+            String imageUrl
+        ) {}
     }
 }
