@@ -6,6 +6,7 @@ import java.util.List;
 public record BuildingResponse(
     Long id,
     String name,
+    String address,
     Location location,
     List<WaypointResponse> waypoints
 ) {

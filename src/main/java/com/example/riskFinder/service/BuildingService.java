@@ -70,6 +70,7 @@ public class BuildingService {
         return new BuildingResponse(
             building.getId(),
             building.getName(),
+            building.getAddress(),
             new BuildingResponse.Location(
                 building.getLocation().getY(),
                 building.getLocation().getX()
