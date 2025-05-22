@@ -18,7 +18,7 @@ public record BuildingResponse(
     ) {
         public record CrackResponse(
             String timestamp,
-            double width_mm,
+            double widthMm,
             String imageUrl
         ) {}
     }
