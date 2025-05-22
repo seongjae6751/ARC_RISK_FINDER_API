@@ -54,7 +54,8 @@ public class BuildingService {
                         .map(m -> new BuildingResponse.WaypointResponse.CrackResponse(
                             m.getMeasurementDate().toString(),
                             m.getWidthMm(),
-                            m.getImageUrl()
+                            m.getImageUrl(),
+                            c.getCrackType() // 추가된 필드
                         ))
                     ).toList();
 

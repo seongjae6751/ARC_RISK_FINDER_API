@@ -39,6 +39,9 @@ public class Crack {
     @Column(nullable = false)
     private double altitude;
 
+    @Column(name = "crack_type", nullable = false)
+    private String crackType;
+
     @Column(name = "detected_at")
     private LocalDateTime detectedAt;
 
