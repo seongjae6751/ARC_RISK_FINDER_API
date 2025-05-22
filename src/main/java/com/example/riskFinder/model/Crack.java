@@ -39,9 +39,6 @@ public class Crack {
     @Column(nullable = false)
     private double altitude;
 
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
-
     @Column(name = "detected_at")
     private LocalDateTime detectedAt;
 

@@ -26,6 +26,9 @@ public class CrackMeasurement {
     @Column(name = "width_mm", nullable = false)
     private double widthMm;
 
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

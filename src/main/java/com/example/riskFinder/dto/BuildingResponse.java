@@ -1,5 +1,6 @@
 package com.example.riskFinder.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record BuildingResponse(
@@ -15,6 +16,15 @@ public record BuildingResponse(
         Location location,
         List<CrackResponse> cracks
     ) {
-        public record CrackResponse(String timestamp, double widthMm, String imageUrl) {}
+        public record CrackResponse(
+            String timestamp, // 균열 최초 탐지 시각
+            List<MeasurementEntry> measurements
+        ) {
+            public record MeasurementEntry(
+                double widthMm,
+                String imageUrl,
+                LocalDateTime measuredAt
+            ) {}
+        }
     }
 }

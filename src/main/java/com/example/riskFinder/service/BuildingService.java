@@ -52,17 +52,22 @@ public class BuildingService {
 
                 List<BuildingResponse.WaypointResponse.CrackResponse> crackResponses = cracks.stream()
                     .map(c -> {
-                        CrackMeasurement latest = measurementRepository.findByCrackId(c.getCrackId())
-                            .stream()
-                            .max(Comparator.comparing(CrackMeasurement::getMeasurementDate))
-                            .orElse(null);
+                        List<CrackMeasurement> measurements = measurementRepository.findByCrackId(c.getCrackId());
+
+                        List<BuildingResponse.WaypointResponse.CrackResponse.MeasurementEntry> entries = measurements.stream()
+                            .map(m -> new BuildingResponse.WaypointResponse.CrackResponse.MeasurementEntry(
+                                m.getWidthMm(),
+                                m.getImageUrl(),
+                                m.getMeasurementDate()
+                            ))
+                            .toList();
 
                         return new BuildingResponse.WaypointResponse.CrackResponse(
                             c.getDetectedAt() != null ? c.getDetectedAt().toString() : null,
-                            latest != null ? latest.getWidthMm() : 0.0,
-                            c.getImageUrl()
+                            entries
                         );
-                    }).toList();
+                    })
+                    .toList();
 
                 return new BuildingResponse.WaypointResponse(
                     wp.getId(),

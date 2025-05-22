@@ -2,6 +2,7 @@ package com.example.riskFinder.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -99,10 +100,12 @@ public class CrackService {
                     wp.getLatitude(), wp.getLongitude(), wp.getAltitude()
                 );
                 List<WaypointImagesResponse.ImageEntry> entries = cracks.stream()
-                    .map(c -> new WaypointImagesResponse.ImageEntry(
-                        c.getImageUrl(),
-                        c.getDetectedAt()
-                    ))
+                    .map(c -> measurementRepository.findByCrackId(c.getCrackId())
+                        .stream()
+                        .max(Comparator.comparing(CrackMeasurement::getMeasurementDate))
+                        .map(m -> new WaypointImagesResponse.ImageEntry(m.getImageUrl(), m.getMeasurementDate()))
+                        .orElse(null))
+                    .filter(e -> e != null)
                     .toList();
 
                 return new WaypointImagesResponse(
@@ -112,6 +115,7 @@ public class CrackService {
                 );
             }).toList();
     }
+
 
     public List<WaypointMeasurementsResponse> getWaypointMeasurementsByBuilding(Long buildingId) {
         Building building = buildingRepository.findById(buildingId)
