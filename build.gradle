@@ -36,6 +36,13 @@ dependencies {
 	// geometry
 	implementation 'org.locationtech.jts:jts-core:1.19.0'
 	implementation 'org.hibernate.orm:hibernate-spatial:6.2.7.Final'
+
+	// aws
+	implementation 'com.amazonaws:aws-java-sdk:1.12.672'
+
+	// s3
+	implementation platform('software.amazon.awssdk:bom:2.20.56')
+	implementation 'software.amazon.awssdk:s3'
 }
 
 tasks.named('test') {
