@@ -6,10 +6,11 @@ import com.example.riskFinder.dto.BuildingCrackCountDto;
 import com.example.riskFinder.dto.BuildingCrackWidthDto;
 import com.example.riskFinder.model.Crack;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public interface CrackRepository extends JpaRepository<Crack, Long> {
 
@@ -50,4 +51,6 @@ public interface CrackRepository extends JpaRepository<Crack, Long> {
       AND c.altitude = :alt
     """)
     List<Crack> findByExactLocation(double lat, double lon, double alt);
+
+    Optional<Crack> findByLatitudeAndLongitudeAndAltitude(double latitude, double longitude, double altitude);
 }

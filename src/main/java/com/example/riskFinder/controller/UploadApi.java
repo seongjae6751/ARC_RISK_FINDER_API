@@ -25,6 +25,7 @@ public interface UploadApi {
     ResponseEntity<Map<String, String>> uploadFile(
         @RequestParam String accessKey,
         @RequestParam String domain,
+        @RequestParam("waypointId") Long waypointId,
         @RequestPart MultipartFile file
     );
 }

@@ -32,6 +32,7 @@ public class UploadController implements UploadApi {
     public ResponseEntity<Map<String, String>> uploadFile(
         @RequestParam String accessKey,
         @RequestParam String domain,
+        @RequestParam("waypointId") Long waypointId,
         @RequestPart MultipartFile file
     ) {
         if (!fixedAccessKey.equals(accessKey)) {
@@ -39,7 +40,7 @@ public class UploadController implements UploadApi {
                 .body(Map.of("message", "인증 실패: 유효하지 않은 accessKey입니다."));
         }
 
-        UploadFileResponse response = uploadService.upload(domain, file); // ⚠ 여기 변경
+        UploadFileResponse response = uploadService.upload(domain, file, waypointId); // ⚠ 여기 변경
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(Map.of("file_url", response.fileUrl())
             );

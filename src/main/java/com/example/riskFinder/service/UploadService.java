@@ -6,10 +6,12 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.riskFinder.dto.UploadFileResponse;
+import com.example.riskFinder.model.CrackImageAnalysisEvent;
 import com.example.riskFinder.model.S3Client;
 
 import lombok.RequiredArgsConstructor;
@@ -19,11 +21,17 @@ import lombok.RequiredArgsConstructor;
 public class UploadService {
 
     private final S3Client s3Client;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public UploadFileResponse upload(String domain, MultipartFile file) {
+    public UploadFileResponse upload(String domain, MultipartFile file, Long waypointId) {
         try {
             String filePath = generateFilePath(domain, Objects.requireNonNull(file.getOriginalFilename()));
-            return s3Client.uploadFile(filePath, file.getBytes());
+            UploadFileResponse response = s3Client.uploadFile(filePath, file.getBytes());
+
+            CrackImageAnalysisEvent event = new CrackImageAnalysisEvent(response.fileUrl(), waypointId);
+            eventPublisher.publishEvent(event);
+
+            return response;
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 실패", e);
         }
