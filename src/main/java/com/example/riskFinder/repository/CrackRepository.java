@@ -48,6 +48,6 @@ public interface CrackRepository extends JpaRepository<Crack, Long> {
     WHERE c.latitude = :lat
       AND c.longitude = :lon
       AND c.altitude = :alt
-""")
+    """)
     List<Crack> findByExactLocation(double lat, double lon, double alt);
 }

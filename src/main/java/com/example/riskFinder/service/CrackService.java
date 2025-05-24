@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.example.riskFinder.dto.*;
@@ -42,19 +43,12 @@ public class CrackService {
         log.info("📍 [SAVE] 요청 도착: lat={}, lon={}, alt={}",
             req.latitude(), req.longitude(), req.altitude());
 
-        Building building = buildingRepository
-            .findNearestByLonLat(req.latitude(), req.longitude(), 100)
-            .orElseGet(() -> {
-                log.info("🔍 [BUILDING] DB에 없음 → 카카오 API 호출 시도");
-                return kakaoService.fetchNearestAndConvert(req.latitude(), req.longitude(), 500)
-                    .map(b -> {
-                        log.info("🏢 [BUILDING] 카카오 응답으로 새 건물 저장: {}", b.getName());
-                        return buildingRepository.save(b);
-                    })
-                    .orElse(null);
-            });
+        Long gonghak3Id = 26L; // 실제 DB에서 "공학 3관"의 ID를 확인하고 바꿔주세요
 
-        log.info("📦 [WAYPOINT] Building 매핑 상태: {}", building != null ? building.getName() : "null");
+        Building building = buildingRepository.findById(gonghak3Id)
+            .orElseThrow(() -> new IllegalStateException("공학 3관이 DB에 존재하지 않습니다."));
+
+        log.info("📦 [WAYPOINT] 공학 3관으로 강제 매핑: {}", building.getName());
 
         Waypoint wp = Waypoint.builder()
             .latitude(req.latitude())
@@ -67,20 +61,18 @@ public class CrackService {
         log.info("✅ [WAYPOINT] 저장 완료: id={}", wp.getId());
     }
 
-    public List<WaypointsResponse> getWaypoints() {
-        return waypointRepository.findAll().stream()
+    public List<WaypointsResponse> getWaypoints(Long buildingId) {
+        return waypointRepository.findByBuildingId(buildingId).stream()
             .map(wp -> {
-                // 가장 최근 Crack 탐지일 조회 (좌표 기준)
                 List<Crack> cracks = crackRepository.findByExactLocation(
                     wp.getLatitude(), wp.getLongitude(), wp.getAltitude()
                 );
 
-                LocalDate latest = cracks.stream()
-                    .map(Crack::getDetectedAt)
-                    .filter(d -> d != null)
-                    .map(LocalDateTime::toLocalDate)
-                    .max(LocalDate::compareTo)
-                    .orElse(null);
+                Crack crack = cracks.isEmpty() ? null : cracks.get(0);
+
+                LocalDate latest = crack != null && crack.getDetectedAt() != null
+                    ? crack.getDetectedAt().toLocalDate()
+                    : null;
 
                 return new WaypointsResponse(
                     wp.getId(),
@@ -90,7 +82,8 @@ public class CrackService {
                     wp.getAltitude(),
                     latest
                 );
-            }).toList();
+            })
+            .toList();
     }
 
     public List<WaypointImagesResponse> getWaypointImages() {

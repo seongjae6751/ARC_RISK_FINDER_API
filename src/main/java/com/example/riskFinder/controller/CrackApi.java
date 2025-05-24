@@ -33,8 +33,10 @@ public interface CrackApi {
             @ApiResponse(responseCode = "400", description = ""),
             @ApiResponse(responseCode = "404", description = "")
     })
-    @GetMapping("/waypoints")
-    ResponseEntity<List<WaypointsResponse>> getWaypoints();
+    @GetMapping("/waypoints/{buildingId}")
+    ResponseEntity<List<WaypointsResponse>> getWaypoints(
+        @PathVariable Long buildingId
+    );
 
     @Operation(summary = "특정 웨이포인트 별 사진 조회")
     @ApiResponses(value = {
