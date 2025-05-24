@@ -32,6 +32,12 @@ public class Waypoint {
     @Column(name = "visit_count")
     private int visitCount = 0;
 
+    @Column(name = "sequence")
+    private int sequence = 0;
+
+    @Column(name = "heading")
+    private double heading = 0.0;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "building_id")
     private Building building;

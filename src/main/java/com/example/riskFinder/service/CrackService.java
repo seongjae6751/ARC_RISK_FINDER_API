@@ -54,6 +54,8 @@ public class CrackService {
             .latitude(req.latitude())
             .longitude(req.longitude())
             .altitude(req.altitude())
+            .sequence(req.sequence())
+            .heading(req.heading())
             .building(building)
             .build();
 
@@ -80,7 +82,9 @@ public class CrackService {
                     wp.getLatitude(),
                     wp.getLongitude(),
                     wp.getAltitude(),
-                    latest
+                    latest,
+                    wp.getSequence(),
+                    wp.getHeading()
                 );
             })
             .toList();
