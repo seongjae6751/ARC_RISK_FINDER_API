@@ -13,7 +13,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOriginPatterns("http://localhost:3000", "http://localhost:5173")
+            .allowedOriginPatterns("http://localhost:3000", "http://localhost:5173", "https://arfarf.netlify.app")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
             .allowCredentials(true)
             .allowedHeaders("*");

@@ -11,6 +11,7 @@ import com.example.riskFinder.dto.BuildingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RequestMapping("/buildings")
 public interface BuildingApi {
@@ -20,8 +21,10 @@ public interface BuildingApi {
         @ApiResponse(responseCode = "400"),
         @ApiResponse(responseCode = "404")
     })
-    @GetMapping
-    List<BuildingResponse> getBuildings();
+    @GetMapping()
+    List<BuildingResponse> getBuildings(
+        HttpServletRequest request
+    );
 
     @Operation(summary = "특정 빌딩 가져오기")
     @ApiResponses(value = {
@@ -30,5 +33,8 @@ public interface BuildingApi {
         @ApiResponse(responseCode = "404", description = "")
     })
     @GetMapping("/{id}")
-    BuildingResponse getBuilding(@PathVariable Long id);
+    BuildingResponse getBuilding(
+        @PathVariable Long id,
+        HttpServletRequest request
+    );
 }

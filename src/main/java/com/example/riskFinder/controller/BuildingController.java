@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.riskFinder.dto.BuildingResponse;
 import com.example.riskFinder.service.BuildingService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -19,13 +20,18 @@ public class BuildingController implements BuildingApi{
 
     private final BuildingService buildingService;
 
-    @GetMapping
-    public List<BuildingResponse> getBuildings() {
-        return buildingService.getAllBuildings();
+    @GetMapping()
+    public List<BuildingResponse> getBuildings(
+        HttpServletRequest request
+    ) {
+        return buildingService.getAllBuildings(request);
     }
 
     @GetMapping("/{id}")
-    public BuildingResponse getBuilding(@PathVariable Long id) {
-        return buildingService.getBuilding(id);
+    public BuildingResponse getBuilding(
+        @PathVariable Long id,
+        HttpServletRequest request
+    ) {
+        return buildingService.getBuilding(id, request);
     }
 }
