@@ -30,7 +30,7 @@ public class ProxyController {
         headers.setContentType(MediaType.parseMediaType(
             response.headers().firstValue("Content-Type").orElse("application/octet-stream")
         ));
-        headers.set("Access-Control-Allow-Origin", "*");
+        headers.set("Access-Control-Allow-Origin", "https://arfarf.netlify.app");
 
         return new ResponseEntity<>(response.body(), headers, HttpStatus.OK);
     }
