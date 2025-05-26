@@ -41,11 +41,11 @@ public class Crack {
     @Column(nullable = false)
     private double altitude;
 
-    @Column(name = "crack_type", nullable = false)
+    @Column(name = "crack_type")
     private String crackType;
 
     @Column(name = "detected_at")
-    private LocalDateTime detectedAt;
+    private LocalDateTime detectedAt = LocalDateTime.now();
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

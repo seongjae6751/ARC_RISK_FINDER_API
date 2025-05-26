@@ -60,8 +60,15 @@ public class CrackService {
             .building(building)
             .build();
 
+        Crack crack = Crack.builder()
+            .crackId(UUID.randomUUID().toString())
+            .latitude(req.latitude())
+            .longitude(req.longitude())
+            .altitude(req.altitude())
+            .build();
+
         waypointRepository.save(wp);
-        log.info("✅ [WAYPOINT] 저장 완료: id={}", wp.getId());
+        crackRepository.save(crack);
     }
 
     public List<WaypointsResponse> getWaypoints(Long buildingId) {
