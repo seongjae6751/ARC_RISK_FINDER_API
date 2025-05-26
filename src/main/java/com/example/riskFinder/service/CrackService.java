@@ -85,7 +85,8 @@ public class CrackService {
                     wp.getAltitude(),
                     latest,
                     wp.getSequence(),
-                    wp.getHeading()
+                    wp.getHeading(),
+                    wp.getType()
                 );
             })
             .toList();

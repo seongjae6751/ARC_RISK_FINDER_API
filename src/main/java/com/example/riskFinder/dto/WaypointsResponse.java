@@ -2,6 +2,8 @@ package com.example.riskFinder.dto;
 
 import java.time.LocalDate;
 
+import com.example.riskFinder.model.WaypointType;
+
 public record WaypointsResponse(
     Long id,
     String label,
@@ -10,5 +12,6 @@ public record WaypointsResponse(
     double altitude,
     LocalDate latestDetectionDate,
     int sequence,
-    double heading
+    double heading,
+    WaypointType type
 ) {}
