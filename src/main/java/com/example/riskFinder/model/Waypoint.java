@@ -48,6 +48,10 @@ public class Waypoint {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private WaypointType type = WaypointType.WAYPOINT;
+
     @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();

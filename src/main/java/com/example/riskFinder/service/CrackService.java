@@ -56,6 +56,7 @@ public class CrackService {
             .altitude(req.altitude())
             .sequence(req.sequence())
             .heading(req.heading())
+            .type(req.type())
             .building(building)
             .build();
 
