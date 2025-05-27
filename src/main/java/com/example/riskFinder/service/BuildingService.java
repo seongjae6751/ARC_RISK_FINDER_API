@@ -1,6 +1,5 @@
 package com.example.riskFinder.service;
 
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,8 +7,8 @@ import org.springframework.stereotype.Service;
 import com.example.riskFinder.dto.BuildingResponse;
 import com.example.riskFinder.model.Building;
 import com.example.riskFinder.model.Crack;
-import com.example.riskFinder.model.CrackMeasurement;
 import com.example.riskFinder.model.Waypoint;
+import com.example.riskFinder.model.WaypointType;
 import com.example.riskFinder.repository.BuildingRepository;
 import com.example.riskFinder.repository.CrackMeasurementRepository;
 import com.example.riskFinder.repository.CrackRepository;
@@ -40,7 +39,9 @@ public class BuildingService {
 
     private BuildingResponse convertToResponse(Building building) {
         List<Waypoint> waypoints = waypointRepository.findAll().stream()
-            .filter(wp -> wp.getBuilding() != null && wp.getBuilding().getId().equals(building.getId()))
+            .filter(wp -> wp.getBuilding() != null
+                && wp.getBuilding().getId().equals(building.getId())
+                && wp.getType() == WaypointType.WAYPOINT)
             .toList();
 
         List<BuildingResponse.WaypointResponse> waypointResponses = waypoints.stream()
