@@ -15,6 +15,7 @@ public record BuildingResponse(
         Long id,
         String label,
         Location location,
+        double altitude,
         List<CrackResponse> cracks
     ) {
         public record CrackResponse(

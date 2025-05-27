@@ -64,6 +64,7 @@ public class BuildingService {
                     wp.getId(),
                     "WP " + wp.getId(),
                     new BuildingResponse.Location(wp.getLatitude(), wp.getLongitude()),
+                    wp.getAltitude(),
                     crackResponses
                 );
             }).toList();
