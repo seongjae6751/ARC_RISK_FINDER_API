@@ -43,4 +43,10 @@ public class CrackCotroller implements CrackApi{
         List<WaypointMeasurementsResponse> responses = crackService.getWaypointMeasurementsByBuilding(id);
         return ResponseEntity.ok(responses);
     }
+
+    @DeleteMapping("/buildings/{id}/waypoints")
+    public ResponseEntity<Void> deleteWaypointsByBuilding(@PathVariable Long id) {
+        crackService.deleteWaypointsByBuilding(id);
+        return ResponseEntity.noContent().build();
+    }
 }

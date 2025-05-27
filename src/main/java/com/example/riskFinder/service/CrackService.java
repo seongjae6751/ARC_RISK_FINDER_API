@@ -151,4 +151,10 @@ public class CrackService {
                 );
             }).toList();
     }
+
+    @Transactional
+    public void deleteWaypointsByBuilding(Long buildingId) {
+        List<Waypoint> waypoints = waypointRepository.findByBuildingId(buildingId);
+        waypointRepository.deleteAll(waypoints);
+    }
 }
