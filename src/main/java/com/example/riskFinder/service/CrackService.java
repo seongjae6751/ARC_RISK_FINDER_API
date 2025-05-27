@@ -43,12 +43,12 @@ public class CrackService {
         log.info("📍 [SAVE] 요청 도착: lat={}, lon={}, alt={}",
             req.latitude(), req.longitude(), req.altitude());
 
-        Long gonghak3Id = 29L; // 실제 DB에서 "담헌"의 ID
+        Long gonghak3Id = 28L; // 실제 DB에서 "공학2관"의 ID
 
         Building building = buildingRepository.findById(gonghak3Id)
-            .orElseThrow(() -> new IllegalStateException("담헌 실학관이 DB에 존재하지 않습니다."));
+            .orElseThrow(() -> new IllegalStateException("공학 2관이 DB에 존재하지 않습니다."));
 
-        log.info("📦 [WAYPOINT] 담헌실학관으로 강제 매핑: {}", building.getName());
+        log.info("📦 [WAYPOINT] 공학2관으로 매핑: {}", building.getName());
 
         Waypoint wp = Waypoint.builder()
             .latitude(req.latitude())
